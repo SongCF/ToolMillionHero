@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	ocr.GetImageText("../screenshot_1.png")
+	ocr.GetImageText("screenshot_1.png")
 	fmt.Println("ok")
 }

@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"github.com/SongCF/ToolMillionHero/baidu/auth"
 	"github.com/SongCF/ToolMillionHero/utils"
+	"github.com/kataras/go-errors"
 	"image"
-	"image/gif"
-	"image/jpeg"
 	"image/png"
 	"io"
 	"io/ioutil"
@@ -34,7 +33,7 @@ type Words struct {
 }
 
 func GetImageText(filename string) {
-	imgBytes, err := loadImageBytes(filename)
+	imgBytes, err := loadClipImageBytes(filename)
 	img := base64.StdEncoding.EncodeToString(imgBytes)
 	log.Println("image size:", len(img))
 	//
@@ -54,52 +53,52 @@ func loadImageBytes(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
-//func loadClipImageBytes(filename string) ([]byte, error) {
-//	const w, h, x0, y0 = 1080, 1920, 50, 700
-//	const x1, y1 = w - x0, h - 280
-//	inFile, err := os.Open(filename)
-//	defer inFile.Close()
-//	if err != nil {
-//		panic(err)
-//	}
-//	err = clip(inFile, fOut, x0, y0, x1, y1, 100)
-//	if err != nil {
-//		panic(err)
-//	}
-//}
-//
-//func clip(in io.Reader, out io.Writer, x0, y0, x1, y1, quality int) error {
-//	origin, fm, err := image.Decode(in)
-//	if err != nil {
-//		return err
-//	}
-//
-//	switch fm {
-//	case "jpeg":
-//		img := origin.(*image.YCbCr)
-//		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.YCbCr)
-//		return jpeg.Encode(out, subImg, &jpeg.Options{quality})
-//	case "png":
-//		switch canvas.(type) {
-//		case *image.NRGBA:
-//			img := canvas.(*image.NRGBA)
-//			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.NRGBA)
-//			return png.Encode(out, subImg)
-//		case *image.RGBA:
-//			img := canvas.(*image.RGBA)
-//			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.RGBA)
-//			return png.Encode(out, subImg)
-//		}
-//	case "gif":
-//		img := origin.(*image.Paletted)
-//		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.Paletted)
-//		return gif.Encode(out, subImg, &gif.Options{})
-//	case "bmp":
-//		img := origin.(*image.RGBA)
-//		subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.RGBA)
-//		return bmp.Encode(out, subImg)
-//	default:
-//		return errors.New("ERROR FORMAT")
-//	}
-//	return nil
-//}
+func loadClipImageBytes(filename string) ([]byte, error) {
+	newFilename := "screenshot_clip.png"
+	fIn, err := os.Open(filename)
+	defer fIn.Close()
+	if err != nil {
+		panic(err)
+	}
+	fOut, _ := os.Create(newFilename)
+	defer fOut.Close()
+
+	err = clip(fIn, fOut)
+	if err != nil {
+		panic(err)
+	}
+	return ioutil.ReadFile(newFilename)
+}
+
+func clip(in io.Reader, out io.Writer) error {
+	src, fm, err := image.Decode(in)
+	if err != nil {
+		return err
+	}
+	wh := src.Bounds().Max
+
+	// 截图量的题目范围
+	const w, h, board, down, top = 1080, 1920, 50, 700, 280
+	realW, realH := wh.X, wh.Y
+	xScale, yScale := realW/w, realH/h
+	x0, y0 := board*xScale, top*yScale
+	x1, y1 := realW-x0, realH-down*yScale
+
+	switch fm {
+	case "png":
+		switch src.(type) {
+		case *image.NRGBA:
+			img := src.(*image.NRGBA)
+			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.NRGBA)
+			return png.Encode(out, subImg)
+		case *image.RGBA:
+			img := src.(*image.RGBA)
+			subImg := img.SubImage(image.Rect(x0, y0, x1, y1)).(*image.RGBA)
+			return png.Encode(out, subImg)
+		default:
+			return errors.New("error image type")
+		}
+	default:
+		return errors.New("not support image format")
+	}
+}
