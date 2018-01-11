@@ -1,11 +1,11 @@
 package utils
 
 import (
-	"net/http"
 	"bytes"
-	"log"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 func DoHttpWithParse(method, url string, body []byte, headerMap map[string]string, v interface{}) error {

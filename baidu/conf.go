@@ -1,4 +1,4 @@
-package auth_baidu
+package baidu
 
 var AppID = "10671124"
 var AppKey = "c4K2h9mUzUGAU627bdPeC3N6"
