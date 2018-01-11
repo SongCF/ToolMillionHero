@@ -44,6 +44,7 @@ D:\_gopath\src\github.com\SongCF\ToolMillionHero>run.cmd
 
 # 欢迎提供宝贵意见
 
-####欢迎加微信交流：
-![微信](./wachat.jpg)
+#### 欢迎交流：
+个人微信：s821416394
+百万英雄（交流群） ：522564417
 
