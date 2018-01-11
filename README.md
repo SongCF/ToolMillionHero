@@ -38,3 +38,12 @@ D:\_gopath\src\github.com\SongCF\ToolMillionHero>run.cmd
 
 ### iOS 设备
 1.TODO
+
+
+---
+
+# 欢迎提供宝贵意见
+
+####欢迎加微信交流：
+![微信](wachat.jpg)
+
