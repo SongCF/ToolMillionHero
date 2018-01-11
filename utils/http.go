@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func DoHttpWithParse(method, url string, body []byte, headerMap map[string]string, v interface{}) error {
@@ -29,9 +30,39 @@ func DoHttpWithParse(method, url string, body []byte, headerMap map[string]strin
 		log.Println("outil.ReadAll failed", "err", err, "url", url, "method", method, "body", string(body), "header", headerMap)
 		return err2
 	}
+	log.Println("body------->", string(buf))
 	err = json.Unmarshal(buf, v)
 	if err != nil {
 		log.Println("json.Unmarshal failed", "err", err, "url", url, "method", method, "body", string(body), "header", headerMap, "buf", string(buf))
+		return err
+	}
+	return nil
+}
+
+func DoHttpPostObjFormWithParse(url string, r string, v interface{}) error {
+	resp, err := http.Post(url, "application/x-www-form-urlencoded", strings.NewReader(r))
+	if err != nil {
+		log.Println("http req failed", "url", url)
+		log.Println("detail", "post_data", r)
+		log.Println(err.Error())
+		return err
+	}
+	body, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		log.Println("read resp.Body failed", "url", url)
+		log.Println(err.Error())
+		resp.Body.Close()
+		return err2
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		log.Println("read resp.Body failed", "url", url)
+		log.Println(err.Error())
+		return err
+	}
+	err = json.Unmarshal(body, v)
+	if err != nil {
+		log.Println("json parse failed", "info", err.Error(), "body", string(body))
 		return err
 	}
 	return nil

@@ -3,47 +3,49 @@ package auth
 import (
 	"fmt"
 	"github.com/SongCF/ToolMillionHero/baidu"
-	"io/ioutil"
+	"github.com/SongCF/ToolMillionHero/utils"
+	"github.com/kataras/go-errors"
 	"log"
-	"net/http"
 	"time"
 )
 
-var expireTime = int64(86400) * 10 //默认10天token超市，官网提供的时30天
-var Token = &struct {
-	AccessToken string
-	Time        int64
-}{}
+type Token struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
+	Error       string `json:"error"`
+	ErrDesc     string `json:"error_description"`
+	TS          int64
+}
+
+var _token Token
 
 func AccessToken() string {
+	//TODO del
+	return "24.df999ff7107bdedd799ba258c752962c.2592000.1518233975.282335-10671124"
 	now := time.Now().Unix()
-	if now-Token.Time > expireTime {
+	if now-_token.TS >= _token.ExpiresIn {
 		initToken()
 	}
-	return Token.AccessToken
+	return _token.AccessToken
 }
 
 func initToken() {
-	token, err := getAccessToken()
+	t, err := getAccessToken()
 	if err != nil {
 		log.Println("Error: getAccessToken failed")
 		panic(err)
 	}
-	Token.AccessToken = token
-	Token.Time = time.Now().Unix()
+	_token = *t
+	_token.TS = time.Now().Unix()
 }
 
-func getAccessToken() (string, error) {
+func getAccessToken() (*Token, error) {
 	url := fmt.Sprintf("https://aip.baidubce.com/oauth/2.0/token?grant_type=%s&client_id=%s&client_secret=%s",
-		"client_credentiale", baidu.AppKey, baidu.SecretKey)
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
+		"client_credentials", baidu.AppKey, baidu.SecretKey)
+	ack := &Token{}
+	err := utils.DoHttpWithParse("POST", url, nil, nil, ack)
+	if ack.Error != "" {
+		return ack, errors.New("getAccessToken failed: [error]" + ack.Error + " [desc]" + ack.ErrDesc)
 	}
-	defer resp.Body.Close()
-	buf, err2 := ioutil.ReadAll(resp.Body)
-	if err2 != nil {
-		return "", err2
-	}
-	return string(buf), nil
+	return ack, err
 }

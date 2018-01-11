@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/SongCF/ToolMillionHero/baidu/auth"
+	"github.com/SongCF/ToolMillionHero/baidu/ocr"
 )
 
 func main() {
-	fmt.Println(auth.AccessToken())
+	ocr.GetImageText("../screenshot_1.png")
+	fmt.Println("ok")
 }
