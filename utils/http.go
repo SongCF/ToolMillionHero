@@ -30,7 +30,7 @@ func DoHttpWithParse(method, url string, body []byte, headerMap map[string]strin
 		log.Println("outil.ReadAll failed", "err", err, "url", url, "method", method, "body", string(body), "header", headerMap)
 		return err2
 	}
-	log.Println("body------->", string(buf))
+	//log.Println("body------->", string(buf))
 	err = json.Unmarshal(buf, v)
 	if err != nil {
 		log.Println("json.Unmarshal failed", "err", err, "url", url, "method", method, "body", string(body), "header", headerMap, "buf", string(buf))
@@ -60,10 +60,26 @@ func DoHttpPostObjFormWithParse(url string, r string, v interface{}) error {
 		log.Println(err.Error())
 		return err
 	}
+	//log.Println("body------->", string(buf))
 	err = json.Unmarshal(body, v)
 	if err != nil {
 		log.Println("json parse failed", "info", err.Error(), "body", string(body))
 		return err
 	}
 	return nil
+}
+
+func DoHttpGet(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("DoHttpGet http.Get failed:", err.Error())
+		return nil, err
+	}
+	defer resp.Body.Close()
+	buf, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		log.Println("DoHttpGet ioutil.ReadAll failed:", err2.Error())
+		return nil, err2
+	}
+	return buf, nil
 }

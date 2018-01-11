@@ -32,7 +32,7 @@ type Words struct {
 	Words string `json:"words"`
 }
 
-func GetImageText(filename string) {
+func GetImageText(filename string) ([]string, error) {
 	imgBytes, err := loadClipImageBytes(filename)
 	img := base64.StdEncoding.EncodeToString(imgBytes)
 	log.Println("image size:", len(img))
@@ -46,7 +46,15 @@ func GetImageText(filename string) {
 	if err != nil {
 		log.Println("DoHttpPostObjFormWithParse failed")
 	}
-	log.Println("ack:", ack)
+	//log.Println("ack:", ack)
+	if ack.ErrorCode != 0 {
+		return nil, errors.New(ack.ErrorMsg)
+	}
+	var l []string
+	for i := range ack.WordsResult {
+		l = append(l, ack.WordsResult[i].Words)
+	}
+	return l, nil
 }
 
 func loadImageBytes(filename string) ([]byte, error) {
