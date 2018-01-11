@@ -2,10 +2,10 @@ package ocr
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/SongCF/ToolMillionHero/baidu/auth"
 	"github.com/SongCF/ToolMillionHero/utils"
-	"github.com/kataras/go-errors"
 	"image"
 	"image/png"
 	"io"

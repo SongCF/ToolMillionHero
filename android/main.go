@@ -12,7 +12,7 @@ import (
 
 func main() {
 	const filename = "screenshot.png"
-	Screenshot(filename)
+	//Screenshot(filename) // adb shell 在golang里用不了
 	words, err := ocr.GetImageText(filename)
 	if err != nil {
 		panic(err)
@@ -30,6 +30,7 @@ func main() {
 	sort.Slice(l, func(i, j int) bool {
 		return l[i].N < l[j].N
 	})
+	fmt.Println("Q:", q)
 	for _, v := range l {
 		fmt.Printf("%d  %s\n", v.N, v.A)
 	}
@@ -47,22 +48,27 @@ func getQuestion(words []string) (string, []string) {
 	return q, words[1:] //第一个肯定不是答案， 为了搜索q还是返回全部
 }
 
-func Screenshot(filename string) {
-	_, err := exec.Command("/system/bin/screencap", "-p", filename).Output()
-	if err != nil {
-		panic("screenshot failed")
-	}
-}
-
 //func Screenshot(filename string) {
-//	cmd := fmt.Sprintf("adb shell /system/bin/screencap -p /data/local/tmp/%s", filename)
-//	_, err := exec.Command("adb shell /system/bin/screencap", "-p", filename).Output()
+//	_, err := exec.Command("/system/bin/screencap", "-p", filename).Output()
 //	if err != nil {
-//		panic("screenshot failed:" + err.Error())
-//	}
-//	cmd = fmt.Sprintf("adb pull /data/local/tmp/%s ./", filename)
-//	_, err = exec.Command(cmd).Output()
-//	if err != nil {
-//		panic("pull failed:" + err.Error())
+//		panic("screenshot failed")
 //	}
 //}
+
+func Screenshot(filename string) {
+	var str string
+	var cmd *exec.Cmd
+	var err error
+	str = fmt.Sprintf("adb shell /system/bin/screencap -p /data/local/tmp/%s", filename)
+	cmd = exec.Command(str)
+	err = cmd.Run()
+	if err != nil {
+		panic("screenshot failed:" + err.Error())
+	}
+	str = fmt.Sprintf("adb pull /data/local/tmp/%s ./", filename)
+	cmd = exec.Command(str)
+	err = cmd.Run()
+	if err != nil {
+		panic("pull failed:" + err.Error())
+	}
+}

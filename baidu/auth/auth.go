@@ -1,10 +1,10 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"github.com/SongCF/ToolMillionHero/baidu"
 	"github.com/SongCF/ToolMillionHero/utils"
-	"github.com/kataras/go-errors"
 	"log"
 	"time"
 )
@@ -20,7 +20,6 @@ type Token struct {
 var _token Token
 
 func AccessToken() string {
-	return "24.df999ff7107bdedd799ba258c752962c.2592000.1518233975.282335-10671124"
 	now := time.Now().Unix()
 	if now-_token.TS >= _token.ExpiresIn {
 		initToken()
