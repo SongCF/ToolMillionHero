@@ -8,28 +8,37 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"time"
 )
 
 func main() {
 	const filename = "screenshot.png"
 	//Screenshot(filename) // adb shell 在golang里用不了
+	bt := time.Now()
 	words, err := ocr.GetImageText(filename)
+	log.Println("ts: GetImageText", time.Since(bt))
 	if err != nil {
 		panic(err)
 	}
+	bt = time.Now()
 	q, aList := getQuestion(words)
 	l := []search.AN{}
 	for _, v := range aList {
 		l = append(l, search.AN{A: v, N: 0})
 	}
+	log.Println("ts: getQuestion", time.Since(bt))
+	bt = time.Now()
 	l, err = search.GetAnswerWeight(q, l)
+	log.Println("ts: GetAnswerWeight", time.Since(bt))
 	if err != nil {
 		log.Println("search.GetAnswerWeight failed:", err)
 	}
 	//sort
+	bt = time.Now()
 	sort.Slice(l, func(i, j int) bool {
 		return l[i].N < l[j].N
 	})
+	log.Println("ts: sort", time.Since(bt))
 	fmt.Println("Q:", q)
 	for _, v := range l {
 		fmt.Printf("%d  %s\n", v.N, v.A)

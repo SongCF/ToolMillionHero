@@ -18,8 +18,14 @@ func GetAnswerWeight(q string, l []AN) ([]AN, error) {
 	if err != nil {
 		return nil, err
 	}
+	n := len(urlList)
+	chanHTML := make(chan []byte)
 	for _, v := range urlList {
-		data, _ := getHTML(v)
+		go getHTML(v, chanHTML)
+	}
+	//
+	for i := 0; i < n; i++ {
+		data := <-chanHTML
 		str := string(data)
 		for idx := range l {
 			l[idx].N += strings.Count(str, l[idx].A)
@@ -47,6 +53,7 @@ func UrlListByKey(key string, pageNum int) ([]string, error) {
 	return urlList, nil
 }
 
-func getHTML(url string) ([]byte, error) {
-	return utils.DoHttpGet(url)
+func getHTML(url string, c chan []byte) {
+	d, _ := utils.DoHttpGet(url)
+	c <- d
 }

@@ -60,7 +60,7 @@ func DoHttpPostObjFormWithParse(url string, r string, v interface{}) error {
 		log.Println(err.Error())
 		return err
 	}
-	//log.Println("body------->", string(buf))
+	//log.Println("body------->", string(body))
 	err = json.Unmarshal(body, v)
 	if err != nil {
 		log.Println("json parse failed", "info", err.Error(), "body", string(body))

@@ -20,6 +20,7 @@ type Token struct {
 var _token Token
 
 func AccessToken() string {
+	return "24.cf28fda5adc3b59e7e4c38f3d1dd73d9.2592000.1518316427.282335-10671124"
 	now := time.Now().Unix()
 	if now-_token.TS >= _token.ExpiresIn {
 		initToken()
@@ -33,6 +34,7 @@ func initToken() {
 		log.Println("Error: getAccessToken failed")
 		panic(err)
 	}
+	log.Println(*t)
 	_token = *t
 	_token.TS = time.Now().Unix()
 }
