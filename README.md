@@ -27,9 +27,10 @@
 
 #使用
 ### Android 设备
+0. 申请一个百度开发账号，注册中文识别api服务（每天免费500次），获取`app_id` `app_key` `secret_key`，并在`baidu/conf.go`中替换它们
 1. 电脑一台，编译：`go build android/main.go`
 2. Android 手机一台，电脑上安装 ADB，连接上电脑后开启 USB 调试模式
-3. 每当题目出现时执行``等待输出答案run.cmd
+3. 进入百万英雄答题界面执行`run.cmd`，等待输出答案
 
 ```$shell
 D:\_gopath\src\github.com\SongCF\ToolMillionHero>run.cmd
